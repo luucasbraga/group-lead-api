@@ -4,6 +4,8 @@ import com.grouplead.domain.enums.MetricType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -11,7 +13,8 @@ import java.util.Map;
 
 @Entity
 @Table(name = "metrics", indexes = {
-        @Index(name = "idx_metrics_type_timestamp", columnList = "type, timestamp")
+        @Index(name = "idx_metrics_type_timestamp", columnList = "type, timestamp"),
+        @Index(name = "idx_metrics_team_id", columnList = "team_id")
 })
 @Getter
 @Setter
@@ -23,6 +26,10 @@ public class Metric {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 100)
@@ -37,7 +44,7 @@ public class Metric {
     @Column(length = 50)
     private String unit;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String source;
 
     @Column(nullable = false)
@@ -50,6 +57,11 @@ public class Metric {
     @Builder.Default
     private Map<String, String> tags = new HashMap<>();
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    @Builder.Default
+    private Map<String, String> metadata = new HashMap<>();
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -60,5 +72,13 @@ public class Metric {
 
     public String getTag(String key) {
         return this.tags.get(key);
+    }
+
+    public void addMetadata(String key, String value) {
+        this.metadata.put(key, value);
+    }
+
+    public String getMetadataValue(String key) {
+        return this.metadata.get(key);
     }
 }
