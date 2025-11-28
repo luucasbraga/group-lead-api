@@ -1,41 +1,33 @@
 package com.grouplead.dto.response;
 
-import com.grouplead.domain.entity.Alert;
 import com.grouplead.domain.enums.AlertSeverity;
 import com.grouplead.domain.enums.AlertType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
-public record AlertResponse(
-        Long id,
-        AlertType type,
-        AlertSeverity severity,
-        String message,
-        String metricName,
-        Double metricValue,
-        Double thresholdValue,
-        boolean acknowledged,
-        String acknowledgedBy,
-        LocalDateTime acknowledgedAt,
-        LocalDateTime createdAt,
-        LocalDateTime resolvedAt,
-        boolean active
-) {
-    public static AlertResponse from(Alert alert) {
-        return new AlertResponse(
-                alert.getId(),
-                alert.getType(),
-                alert.getSeverity(),
-                alert.getMessage(),
-                alert.getMetricName(),
-                alert.getMetricValue(),
-                alert.getThresholdValue(),
-                alert.getAcknowledged(),
-                alert.getAcknowledgedBy() != null ? alert.getAcknowledgedBy().getFullName() : null,
-                alert.getAcknowledgedAt(),
-                alert.getCreatedAt(),
-                alert.getResolvedAt(),
-                alert.isActive()
-        );
-    }
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AlertResponse {
+    private Long id;
+    private Long teamId;
+    private String teamName;
+    private AlertType type;
+    private AlertSeverity severity;
+    private String title;
+    private String message;
+    private String source;
+    private Map<String, String> metadata;
+    private boolean resolved;
+    private boolean acknowledged;
+    private String resolution;
+    private LocalDateTime createdAt;
+    private LocalDateTime acknowledgedAt;
+    private LocalDateTime resolvedAt;
 }

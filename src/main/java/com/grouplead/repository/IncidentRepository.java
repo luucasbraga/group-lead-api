@@ -8,11 +8,31 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
+
+    Page<Incident> findByTeamIdOrderByStartedAtDesc(Long teamId, Pageable pageable);
+
+    Page<Incident> findAllByOrderByStartedAtDesc(Pageable pageable);
+
+    List<Incident> findByTeamIdAndStatusNotOrderByStartedAtDesc(Long teamId, IncidentStatus status);
+
+    List<Incident> findByStatusNotOrderByStartedAtDesc(IncidentStatus status);
+
+    List<Incident> findByTeamIdAndStartedAtBetween(Long teamId, LocalDateTime start, LocalDateTime end);
+
+    List<Incident> findByStartedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    List<Incident> findByTeamIdAndStatusAndResolvedAtBetween(Long teamId, IncidentStatus status,
+                                                             LocalDateTime start, LocalDateTime end);
+
+    List<Incident> findByStatusAndResolvedAtBetween(IncidentStatus status, LocalDateTime start, LocalDateTime end);
 
     List<Incident> findByStatus(IncidentStatus status);
 

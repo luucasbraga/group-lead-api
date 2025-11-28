@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +20,16 @@ public interface SprintRepository extends JpaRepository<Sprint, Long> {
     Optional<Sprint> findByExternalId(String externalId);
 
     List<Sprint> findByTeamId(Long teamId);
+
+    Page<Sprint> findByTeamIdOrderByStartDateDesc(Long teamId, Pageable pageable);
+
+    Page<Sprint> findAllByOrderByStartDateDesc(Pageable pageable);
+
+    List<Sprint> findTopByTeamIdOrderByEndDateDesc(Long teamId, Pageable pageable);
+
+    List<Sprint> findByTeamIdAndStatusOrderByEndDateDesc(Long teamId, SprintStatus status, Pageable pageable);
+
+    List<Sprint> findByTeamIdOrderByEndDateDesc(Long teamId, Pageable pageable);
 
     List<Sprint> findByStatus(SprintStatus status);
 

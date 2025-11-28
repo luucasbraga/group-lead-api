@@ -5,9 +5,12 @@ import com.grouplead.domain.enums.AlertType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
 @Table(name = "alerts")
@@ -22,6 +25,10 @@ public class Alert {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 100)
     private AlertType type;
@@ -30,8 +37,14 @@ public class Alert {
     @Column(nullable = false, length = 50)
     private AlertSeverity severity;
 
+    @Column(length = 500)
+    private String title;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
+
+    @Column(length = 100)
+    private String source;
 
     @Column(name = "metric_name")
     private String metricName;
@@ -42,9 +55,20 @@ public class Alert {
     @Column(name = "threshold_value")
     private Double thresholdValue;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, String> metadata;
+
     @Column(nullable = false)
     @Builder.Default
-    private Boolean acknowledged = false;
+    private boolean resolved = false;
+
+    @Column(columnDefinition = "TEXT")
+    private String resolution;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean acknowledged = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "acknowledged_by")
@@ -65,7 +89,7 @@ public class Alert {
     private LocalDateTime updatedAt;
 
     public boolean isActive() {
-        return resolvedAt == null;
+        return !resolved;
     }
 
     public boolean isCritical() {
@@ -78,7 +102,9 @@ public class Alert {
         this.acknowledgedAt = LocalDateTime.now();
     }
 
-    public void resolve() {
+    public void resolve(String resolution) {
+        this.resolved = true;
+        this.resolution = resolution;
         this.resolvedAt = LocalDateTime.now();
     }
 }

@@ -24,6 +24,10 @@ public class Incident {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "deployment_id")
     private Deployment deployment;
 
@@ -42,22 +46,46 @@ public class Incident {
     @Builder.Default
     private IncidentStatus status = IncidentStatus.OPEN;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(length = 100)
+    private String source;
+
+    @Column(name = "started_at")
+    private LocalDateTime startedAt;
+
+    @Column(name = "acknowledged_at")
+    private LocalDateTime acknowledgedAt;
 
     @Column(name = "resolved_at")
     private LocalDateTime resolvedAt;
+
+    @Column(name = "mttr_minutes")
+    private Long mttrMinutes;
+
+    @Column(columnDefinition = "TEXT")
+    private String timeline;
+
+    @Column(name = "root_cause", columnDefinition = "TEXT")
+    private String rootCause;
+
+    @Column(columnDefinition = "TEXT")
+    private String resolution;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     public Long getRecoveryTimeMinutes() {
-        if (createdAt == null || resolvedAt == null) {
+        if (mttrMinutes != null) {
+            return mttrMinutes;
+        }
+        if (startedAt == null || resolvedAt == null) {
             return null;
         }
-        return Duration.between(createdAt, resolvedAt).toMinutes();
+        return Duration.between(startedAt, resolvedAt).toMinutes();
     }
 
     public boolean isResolved() {
@@ -70,5 +98,9 @@ public class Incident {
 
     public boolean isCritical() {
         return severity == IncidentSeverity.CRITICAL;
+    }
+
+    public boolean isInvestigating() {
+        return status == IncidentStatus.INVESTIGATING;
     }
 }

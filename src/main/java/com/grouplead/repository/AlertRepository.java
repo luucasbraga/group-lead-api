@@ -8,11 +8,22 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface AlertRepository extends JpaRepository<Alert, Long> {
+
+    Page<Alert> findByTeamIdOrderByCreatedAtDesc(Long teamId, Pageable pageable);
+
+    Page<Alert> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    List<Alert> findByTeamIdAndResolvedFalseOrderByCreatedAtDesc(Long teamId);
+
+    List<Alert> findByResolvedFalseOrderByCreatedAtDesc();
 
     List<Alert> findByType(AlertType type);
 

@@ -1,0 +1,13 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: grouplead-api
+  namespace: grouplead
+  labels:
+    app: grouplead
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: grouplead
+      component: api

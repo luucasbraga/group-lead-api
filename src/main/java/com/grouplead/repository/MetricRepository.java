@@ -64,4 +64,25 @@ public interface MetricRepository extends JpaRepository<Metric, Long> {
 
     @Query("DELETE FROM Metric m WHERE m.timestamp < :before")
     void deleteOlderThan(@Param("before") LocalDateTime before);
+
+    @Query("SELECT AVG(m.value) FROM Metric m WHERE m.team.id = :teamId AND m.type = 'VELOCITY' " +
+            "AND m.timestamp BETWEEN :start AND :end")
+    Double findAverageVelocityForTeam(@Param("teamId") Long teamId,
+                                       @Param("start") LocalDateTime start,
+                                       @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(c) FROM Commit c WHERE c.developer.id = :developerId " +
+            "AND c.timestamp >= :since AND (HOUR(c.timestamp) < 9 OR HOUR(c.timestamp) >= 18)")
+    long countAfterHoursCommits(@Param("developerId") Long developerId,
+                                 @Param("since") LocalDateTime since);
+
+    @Query("SELECT COUNT(c) FROM Commit c WHERE c.developer.id = :developerId " +
+            "AND c.timestamp >= :since")
+    long countTotalCommits(@Param("developerId") Long developerId,
+                           @Param("since") LocalDateTime since);
+
+    @Query("SELECT COUNT(c) FROM Commit c WHERE c.developer.id = :developerId " +
+            "AND c.timestamp >= :since AND (DAYOFWEEK(c.timestamp) = 1 OR DAYOFWEEK(c.timestamp) = 7)")
+    long countWeekendCommits(@Param("developerId") Long developerId,
+                              @Param("since") LocalDateTime since);
 }
