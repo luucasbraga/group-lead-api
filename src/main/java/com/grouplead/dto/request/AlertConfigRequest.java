@@ -2,21 +2,41 @@ package com.grouplead.dto.request;
 
 import com.grouplead.domain.enums.AlertSeverity;
 import com.grouplead.domain.enums.AlertType;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public record AlertConfigRequest(
-        @NotNull(message = "Alert type is required")
-        AlertType type,
+import java.util.Map;
 
-        @NotNull(message = "Threshold value is required")
-        @Positive(message = "Threshold value must be positive")
-        Double thresholdValue,
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AlertConfigRequest {
 
-        @NotNull(message = "Severity is required")
-        AlertSeverity severity,
+    private Long teamId;
 
-        String metricName,
+    @NotNull(message = "Alert type is required")
+    private AlertType type;
 
-        boolean enabled
-) {}
+    @NotNull(message = "Severity is required")
+    private AlertSeverity severity;
+
+    @NotBlank(message = "Title is required")
+    private String title;
+
+    @NotBlank(message = "Message is required")
+    private String message;
+
+    private String source;
+
+    private Map<String, String> metadata;
+
+    // For threshold-based alerts
+    private String metricName;
+    private Double thresholdValue;
+    private boolean enabled;
+}

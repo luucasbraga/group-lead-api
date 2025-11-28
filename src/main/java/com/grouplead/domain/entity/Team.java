@@ -3,11 +3,15 @@ package com.grouplead.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "teams")
@@ -35,6 +39,22 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Sprint> sprints = new ArrayList<>();
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "aws_resources", columnDefinition = "jsonb")
+    @Builder.Default
+    private Map<String, String> awsResources = new HashMap<>();
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "integration_config", columnDefinition = "jsonb")
+    @Builder.Default
+    private Map<String, String> integrationConfig = new HashMap<>();
+
+    @Column(name = "jira_project_key")
+    private String jiraProjectKey;
+
+    @Column(name = "gitlab_project_id")
+    private String gitlabProjectId;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
