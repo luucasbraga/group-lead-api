@@ -1,0 +1,22 @@
+spring:
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+
+logging:
+  level:
+    com.grouplead: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+
+scheduler:
+  enabled: true
+
+server:
+  error:
+    include-message: never
+    include-stacktrace: never
