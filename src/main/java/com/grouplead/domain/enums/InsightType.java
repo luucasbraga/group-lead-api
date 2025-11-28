@@ -1,0 +1,12 @@
+package com.grouplead.domain.enums;
+
+public enum InsightType {
+    SPRINT_SUMMARY,
+    DEVELOPER_ANALYSIS,
+    DELIVERY_PREDICTION,
+    ANOMALY_DETECTION,
+    BURNOUT_DETECTION,
+    TEAM_HEALTH,
+    CODE_QUALITY,
+    INFRASTRUCTURE_HEALTH
+}

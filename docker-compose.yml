@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: group-lead-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/grouplead
+      - SPRING_DATASOURCE_USERNAME=grouplead
+      - SPRING_DATASOURCE_PASSWORD=grouplead123
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-that-should-be-at-least-256-bits-long}
+      - JIRA_BASE_URL=${JIRA_BASE_URL:-https://your-company.atlassian.net}
+      - JIRA_USERNAME=${JIRA_USERNAME}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN}
+      - GITLAB_BASE_URL=${GITLAB_BASE_URL:-https://gitlab.com}
+      - GITLAB_TOKEN=${GITLAB_TOKEN}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - grouplead-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: grouplead-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=grouplead
+      - POSTGRES_USER=grouplead
+      - POSTGRES_PASSWORD=grouplead123
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grouplead -d grouplead"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - grouplead-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: grouplead-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - grouplead-network
+    restart: unless-stopped
+
+networks:
+  grouplead-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
